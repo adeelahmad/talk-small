@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- TODO: Implement CSP for better security -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk Small</title>
+</head>
+
+<body>
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <script>
+
+        // state
+        let api = null
+        let connected = false
+        let muted = true
+
+        // elements
+        let containerDiv = null
+        let toggleButton = null
+
+        // extension
+        const vscode = acquireVsCodeApi()
+
+        // connects to jitsi conference
+        const connect = ({ domain, options }) => {
+            if (!connected) {
+                api = new JitsiMeetExternalAPI(
+                    domain,
+                    { ...options, parentNode: containerDiv }
+                )
+                api.once('videoConferenceJoined', () => {
+                    connected = true
+                    muted = true
+                    toggleButton.disabled = false
+                    vscode.postMessage({ type: 'connected' })
+                })
+            }
+        }
+
+        // disconnects from jitsi conference
+        const disconnect = () => {
+            if (connected) {
+                api.dispose()
+                api = null
+                connected = false
+                muted = true
+                toggleButton.disabled = true
+                vscode.postMessage({ type: 'disconnected' })
+            }
+        }
+
+        // turn on mic
+        const unmute = () => {
+            if (connected && muted) {
+                api.executeCommand('toggleAudio')
+                muted = false
+            }
+        }
+
+        // turn off mic
+        const mute = () => {
+            if (connected && !muted) {
+                api.executeCommand('toggleAudio')
+                muted = true
+            }
+        }
+
+        // register dom elements
+        window.onload = () => {
+            containerDiv = document.querySelector('#container')
+            toggleButton = document.querySelector('#toggle')
+            vscode.postMessage({ type: 'initialized' })
+        }
+
+        // register extension event handlers
+        window.addEventListener('message', ({ data }) => {
+            switch (data?.type) {
+                case 'connect': return connect(data.payload)
+                case 'disconnect': return disconnect(data.payload)
+            }
+        })
+    </script>
+    <div id="container" style="display: none;"></div>
+    <div>Monumental Ugly UI</div>
+    <a href="command:talk-small.connect">Connect</a>
+    <button id="toggle" onmousedown="unmute()" onmouseout="mute()" onmouseup="mute()" disabled>PTT</button>
+    <a href="command:talk-small.disconnect">Disconnect</a>
+</body>
+
+</html>

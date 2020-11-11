@@ -1,0 +1,75 @@
+{
+	"name": "talk-small",
+	"displayName": "talk-small",
+	"description": "HAM Radio for VSCode",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.51.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onView:talk-small",
+		"onCommand:talk-small.connect"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"views": {
+			"talk-small": [
+				{
+					"id": "talk-small",
+					"name": "Talk Small",
+					"type": "webview"
+				}
+			]
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "talk-small",
+					"icon": "/static/icon.svg",
+					"title": "Talk Small"
+				}
+			]
+		},
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "talk-small.connect",
+					"when": "talk-small:connected != true"
+				},
+				{
+					"command": "talk-small.disconnect",
+					"when": "talk-small:connected == true"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "talk-small.connect",
+				"title": "Talk Small: Connect"
+			},
+			{
+				"command": "talk-small.disconnect",
+				"title": "Talk Small: Disconnect"
+			}
+		]
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.0",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.51.0",
+		"eslint": "^7.9.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.1.3",
+		"typescript": "^4.0.2",
+		"vscode-test": "^1.4.0"
+	}
+}
