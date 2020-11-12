@@ -1,20 +1,34 @@
 {
 	"name": "talk-small",
-	"displayName": "talk-small",
-	"description": "HAM Radio for VSCode",
+	"publisher": "dhruvin-dev",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.51.0"
 	},
+	"license": "MIT",
+	"displayName": "Talk Small",
+	"description": "Push to Talk for VSCode (powered by jitsi). Developed during Mattermost Hackathon 2020.",
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onView:talk-small",
-		"onCommand:talk-small.connect"
-	],
-	"main": "./extension.js",
+	"preview": true,
+	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "Talk Small",
+			"properties": {
+				"talk-small.domain": {
+					"type": "string",
+					"default": "meet.jit.si",
+					"markdownDescription": "A public [jitsi](https://meet.jit.si) instance to use. If the instance is hosted on `https://meet.jit.si`, then just enter `meet.jit.si`."
+				},
+				"talk-small.displayName": {
+					"type": "string",
+					"default": "Fellow Jitser",
+					"markdownDescription": "Your display name. It wiill be shown to participants of the call."
+				}
+			}
+		},
 		"views": {
 			"talk-small": [
 				{
@@ -56,20 +70,33 @@
 			}
 		]
 	},
+	"activationEvents": [
+		"onView:talk-small",
+		"onCommand:talk-small.connect"
+	],
+	"qna": "https://hackathon.cloud.mattermost.com/main/channels/idea-talk-small",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dhruvin2910/talk-small.git"
+	},
 	"scripts": {
 		"lint": "eslint .",
-		"pretest": "npm run lint",
-		"test": "node ./test/runTest.js"
+		"build": "rollup -c",
+		"watch": "rollup -cw",
+		"vscode:prepublish": "NODE_ENV=production npm run build"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.0",
+		"@jitsi/js-utils": "^1.0.2",
+		"@rollup/plugin-commonjs": "^16.0.0",
+		"@rollup/plugin-node-resolve": "^10.0.0",
+		"@rollup/pluginutils": "^4.1.0",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.51.0",
+		"builtin-modules": "^3.1.0",
 		"eslint": "^7.9.0",
-		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
-		"typescript": "^4.0.2",
-		"vscode-test": "^1.4.0"
+		"html-minifier-terser": "^5.1.1",
+		"node-html-parser": "^2.0.0",
+		"rollup": "^2.33.1",
+		"rollup-plugin-terser": "^7.0.2"
 	}
 }

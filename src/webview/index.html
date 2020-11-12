@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- TODO: Implement CSP for better security -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk Small</title>
+</head>
+
+<body>
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script src="./webview.js"></script>
+    <div id="container" style="display: none;"></div>
+    <div>Monumental Ugly UI</div>
+    <a href="command:talk-small.connect">Connect</a>
+    <button id="toggle" onmousedown="unmute()" onmouseout="mute()" onmouseup="mute()" disabled>PTT</button>
+    <a href="command:talk-small.disconnect">Disconnect</a>
+</body>
+
+</html>

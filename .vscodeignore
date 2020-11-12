@@ -1,9 +1,8 @@
-.vscode/**
-.vscode-test/**
-test/**
+.vscode
+.eslintignore
 .gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/jsconfig.json
-**/*.map
-**/.eslintrc.json
+.eslintrc.json
+jsconfig.json
+rollup.config.js
+rollup-plugin-webviewer.js
+src
