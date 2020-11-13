@@ -16,7 +16,8 @@ import {
 	CONNECT_COMMAND,
 	DISCONNECT_COMMAND,
 	SET_CONTEXT_COMMAND,
-	CONNECTED_CONTEXT
+	CONNECTED_CONTEXT,
+	CONNECTION_FAILED_EVENT
 } from './constants'
 
 class Extension extends EventEmitter {
@@ -66,29 +67,40 @@ class Extension extends EventEmitter {
 			return this.connect()
 		}
 
+		// collect parameters
+		const displayName = this.configuration.get(DISPLAY_NAME)
+		const lastUsedRoomName = this.context.workspaceState.get(LAST_USED_ROOM_NAME)
+		let roomName = await vscode.window.showInputBox({
+			ignoreFocusOut: true,
+			prompt: 'Enter a room name.',
+			placeHolder: 'Leave empty for a random room.',
+			value: lastUsedRoomName
+		})
+
+		// user skipped entering roomName, abort command
+		if (roomName === undefined) return
+
+		// user left the room name empty, generate one
+		if (roomName === '') roomName = generateRoomWithoutSeparator()
+
 		// connect through webview while showing progress
 		return vscode.window.withProgress({
 			location: { viewId: VIEW_ID },
 			title: 'Connecting'
 		}, async () => {
-			// collect parameters
-			const displayName = this.configuration.get(DISPLAY_NAME)
-			const lastUsedRoomName = this.context.workspaceState.get(LAST_USED_ROOM_NAME)
-			let roomName = await vscode.window.showInputBox({
-				ignoreFocusOut: true,
-				prompt: 'Enter a room name.',
-				placeHolder: 'Leave empty for a random room.',
-				value: lastUsedRoomName
-			})
-
-			// user skipped entering roomName, abort command
-			if (roomName === undefined) return
-
-			// user left the room name empty, generate one
-			if (roomName === '') roomName = generateRoomWithoutSeparator()
-
 			// create promise from event
-			const connection = new Promise(res => this.once(CONNECTED_EVENT, () => res()))
+			const connection = new Promise((res, rej) => {
+				const connected = () => {
+					this.off(CONNECTION_FAILED_EVENT, connectionFailed)
+					res()
+				}
+				const connectionFailed = () => {
+					this.off(CONNECTED_EVENT, connected)
+					rej()
+				}
+				this.once(CONNECTED_EVENT, connected)
+				this.once(CONNECTION_FAILED_EVENT, connectionFailed)
+			})
 
 			// send connection request to webview
 			await this.view.webview.postMessage({
@@ -169,11 +181,28 @@ class Extension extends EventEmitter {
 
 		// context value handlers to enable/disable commands appropriately
 		vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, false)
-		this.on(CONNECTED_EVENT, () => vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, true))
-		this.on(DISCONNECTED_EVENT, () => vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, false))
 
-		// lastUsedRooName update handler
-		this.on(CONNECTED_EVENT, ({ roomName }) => this.context.workspaceState.update(LAST_USED_ROOM_NAME, roomName))
+		// connected handler
+		this.on(CONNECTED_EVENT, ({ roomName }) => {
+			// update context
+			vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, true)
+			// update lastUsedRooName
+			this.context.workspaceState.update(LAST_USED_ROOM_NAME, roomName)
+		})
+
+		// connection failed handler
+		this.on(CONNECTION_FAILED_EVENT, ({ roomName }) => {
+			// update context
+			vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, false)
+			// alert user
+			vscode.window.showErrorMessage(`Could not connect to ${roomName}`)
+		})
+
+		// disconnected handler
+		this.on(DISCONNECTED_EVENT, () => {
+			// update context
+			vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, false)
+		})
 
 		// cleanup
 		context.subscriptions.push(disposeConnectCommand, disposeDisconnectCommand, disposeViewProvider)

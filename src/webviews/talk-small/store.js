@@ -13,7 +13,7 @@ const { subscribe, update } = writable(initialState)
 const onceWithTimeout = (emitter, event, timeout) => new Promise((res, rej) => {
     const timer = setTimeout(() => {
         emitter.off(event, res)
-        rej({ timeout })
+        rej()
     }, timeout)
     emitter.once(event, (value) => {
         clearTimeout(timer)
@@ -32,11 +32,11 @@ export const connect = ({ domain, options }) => new Promise((res, rej) => {
     }))
 
     // handle connection failure
-    const connectionFailed = (error) => update(produce(state => {
+    const connectionFailed = () => update(state => {
         state.api.dispose()
-        state = initialState
-        rej(error)
-    }))
+        rej({ roomName: options.roomName })
+        return initialState
+    })
 
     // try connecting
     update(produce(state => {
@@ -54,12 +54,13 @@ export const connect = ({ domain, options }) => new Promise((res, rej) => {
 
 // disconnects from jitsi conference
 export const disconnect = async () => {
-    update(produce(state => {
+    update(state => {
         if (state.connected) {
             state.api.dispose()
-            state = initialState
+            return initialState
         }
-    }))
+        return state
+    })
 }
 
 // turn on mic
