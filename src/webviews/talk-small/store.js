@@ -1,4 +1,4 @@
-import { TOGGLE_AUDIO_COMMAND, VIDEO_CONFERENCE_JOINED_EVENT } from '../../constants'
+import { TOGGLE_AUDIO_COMMAND, VIDEO_CONFERENCE_JOINED_EVENT, CONNECTION_TIMEOUT } from '../../constants'
 
 import { writable } from 'svelte/store'
 import { produce } from 'immer'
@@ -45,7 +45,7 @@ export const connect = ({ domain, options }) => new Promise((res, rej) => {
                 domain,
                 { ...options, parentNode: document.getElementById('container') }
             )
-            onceWithTimeout(state.api, VIDEO_CONFERENCE_JOINED_EVENT, 30000)
+            onceWithTimeout(state.api, VIDEO_CONFERENCE_JOINED_EVENT, CONNECTION_TIMEOUT)
                 .then(connected)
                 .catch(connectionFailed)
         }
