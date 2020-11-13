@@ -5,7 +5,6 @@ export const VIEW_ID = 'talk-small'
 
 // configuration
 export const CONFIG_SECTION = EXTENSION_ID
-export const DOMAIN = 'domain'
 export const DISPLAY_NAME = 'displayName'
 
 // vscode commands
@@ -24,6 +23,7 @@ export const DISCONNECT_REQUEST = 'disconnect'
 // extension events (nodejs ones)
 export const INITIALIZED_EVENT = 'initialized'
 export const CONNECTED_EVENT = 'connected'
+export const CONNECTION_FAILED_EVENT = 'connectionFailed'
 export const DISCONNECTED_EVENT = 'disconnected'
 
 // workspace state
@@ -38,4 +38,5 @@ export const TOGGLE_AUDIO_COMMAND = 'toggleAudio'
 // webview responses
 export const INITIALIZED_RESPONSE = INITIALIZED_EVENT
 export const CONNECTED_RESPONSE = CONNECTED_EVENT
+export const CONNECTION_FAILED_RESPONSE = CONNECTION_FAILED_EVENT
 export const DISCONNECTED_RESPONSE = DISCONNECTED_EVENT

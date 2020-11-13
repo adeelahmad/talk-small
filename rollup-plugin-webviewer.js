@@ -1,71 +1,88 @@
-import { createFilter } from '@rollup/pluginutils'
-import { parse as parseHtml } from 'node-html-parser'
 import { rollup } from 'rollup'
-import { URL } from 'url'
 import path from 'path'
 import { terser } from 'rollup-plugin-terser'
-import { minify as minifyHtml } from 'html-minifier-terser'
+import svelte from 'rollup-plugin-svelte'
+import html from '@rollup/plugin-html'
+import fs from 'fs'
+import { minify } from 'html-minifier-terser'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
+
+// custom module prefix and path to webviews
+const PREFIX = 'webview:'
+const WEBVIEWS_PATH = './src/webviews'
 
 /**
- * Checks whether the given url is absolute or not (relative)
- * @param {string} url 
- * @returns {boolean}
- */
-const isAbsoluteUrl = (url) => {
-    try {
-        return !!new URL(url)
-    } catch (e) {
-        return false
-    }
-}
-
-/**
- * Helper rollup plugin to inline html and all of its dependencies
+ * Helper rollup plugin to support webview modules
  * @returns {import('rollup').Plugin}
  */
 const webviewer = () => {
     // check production
     const isProduction = process.env.NODE_ENV === 'production'
 
-    // filters webview file
-    const htmlFilter = createFilter('**/webview/index.html')
     return {
         name: 'webviewer',
-        async transform(code, id) {
-            if (htmlFilter(id)) {
-                // parse html code
-                const html = parseHtml(code)
 
-                // extract scripts with relative urls
-                const scripts = html.querySelectorAll('script')
-                    .filter(script => !isAbsoluteUrl(script.getAttribute('src')))
+        // declare that this plugin supports webview:** type of modules
+        resolveId(id) {
+            if (id.startsWith(PREFIX)) return id
+        },
 
-                // generate output of each script
-                const outputs = await Promise.all(scripts.map(async script => {
-                    const src = script.getAttribute('src')
-                    const bundle = await rollup({
-                        input: path.join(id, '..', src),
-                        plugins: [isProduction && terser()]
+        // implemets custom loader using a rollup instance for each webview
+        async load(id) {
+            if (id.startsWith(PREFIX)) {
+                // resolve file paths from id
+                const strippedId = id.slice(PREFIX.length)
+                const mainJSPath = path.join(WEBVIEWS_PATH, strippedId, 'main.js')
+                const templatePath = path.join(WEBVIEWS_PATH, strippedId, 'index.html')
+
+                // create bundle for webview
+                const bundle = await rollup({
+                    input: mainJSPath,
+                    plugins: [
+                        replace({
+                            'process.env.NODE_ENV': isProduction ? "'production'" : "'development'"
+                        }),
+                        resolve(),
+                        commonjs(),
+                        svelte({ css: css => css.write('main.css', false) }),
+                        isProduction && terser(),
+                        html({
+                            template: ({ files: { js, css } }) => {
+                                const script = js.find(file => file.fileName === 'main.js').code
+                                const style = css && css.find(file => file.fileName === 'main.css').source || ''
+                                const template = fs.readFileSync(templatePath, { encoding: 'utf8' })
+                                // relpace /* $SCRIPT */ and /* $STYLE */ placeholders with actual code
+                                return template.replace('/* $SCRIPT */', script).replace('/* $STYLE */', style)
+                            }
+                        })
+                    ]
+                })
+
+                // tell rollup to watch template
+                this.addWatchFile(templatePath)
+
+                // tell rollup to watch dependencies of webview bundle as well
+                bundle.watchFiles.forEach(watchFile => this.addWatchFile(watchFile))
+
+                // generate webview bundle
+                const result = await bundle.generate({})
+
+                // get html page
+                let source = result.output.find(chunkOrAsset => chunkOrAsset.fileName === 'index.html').source
+
+                // minify it if in production
+                if (isProduction) {
+                    source = minify(source, {
+                        collapseWhitespace: true,
+                        minifyCSS: true
                     })
-                    const result = await bundle.generate({})
-                    return result.output[0].code
-                }))
+                }
 
-                // change given scripts from relative-src to inline ones
-                scripts.forEach((script, i) => {
-                    script.removeAttribute('src')
-                    script.set_content(outputs[i])
-                })
-
-                // generate minified html if in production
-                const outputHtml = !isProduction ? html.outerHTML : minifyHtml(html.outerHTML, {
-                    collapseWhitespace: true,
-                    minifyCSS: true
-                })
-
-                // return stringified html code (see rollup-plugin-string)
+                // return html page as default export (see rollup-plugin-string)
                 return {
-                    code: `export default ${JSON.stringify(outputHtml)}`,
+                    code: `export default ${JSON.stringify(source)};`,
                     map: { mappings: '' }
                 }
             }

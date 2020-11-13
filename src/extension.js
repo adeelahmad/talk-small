@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import webviewHtml from './webview/index.html'
+import webviewHtml from 'webview:talk-small'
 import { EventEmitter } from 'events'
 import { generateRoomWithoutSeparator } from '@jitsi/js-utils/random/roomNameGenerator'
 import {
@@ -9,7 +9,6 @@ import {
 	CONNECTED_EVENT,
 	DISCONNECTED_EVENT,
 	LAST_USED_ROOM_NAME,
-	DOMAIN,
 	CONFIG_SECTION,
 	DISPLAY_NAME,
 	CONNECT_REQUEST,
@@ -73,7 +72,6 @@ class Extension extends EventEmitter {
 			title: 'Connecting'
 		}, async () => {
 			// collect parameters
-			const domain = this.configuration.get(DOMAIN)
 			const displayName = this.configuration.get(DISPLAY_NAME)
 			const lastUsedRoomName = this.context.workspaceState.get(LAST_USED_ROOM_NAME)
 			let roomName = await vscode.window.showInputBox({
@@ -96,7 +94,7 @@ class Extension extends EventEmitter {
 			await this.view.webview.postMessage({
 				type: CONNECT_REQUEST,
 				payload: {
-					domain,
+					domain: 'meet.jit.si',
 					options: {
 						roomName,
 						userInfo: { displayName },

@@ -4,5 +4,9 @@
 		"browser": true,
 		"commonjs": false,
 		"node": false
+	},
+	"globals": {
+		"acquireVsCodeApi": "readonly",
+		"JitsiMeetExternalAPI": "readonly"
 	}
 }
