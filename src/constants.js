@@ -31,6 +31,10 @@ export const LAST_USED_ROOM_NAME = 'lastUsedRoomName'
 
 // jitsi events
 export const VIDEO_CONFERENCE_JOINED_EVENT = 'videoConferenceJoined'
+export const PARTICIPANT_JOINED_EVENT = 'participantJoined'
+export const PARTICIPANT_KICKED_OUT_EVENT = 'participantKickedOut'
+export const PARTICIPANT_LEFT_EVENT = 'participantLeft'
+export const DISPLAY_NAME_CHANGE_EVENT = 'displayNameChange'
 
 // jitsi commands
 export const TOGGLE_AUDIO_COMMAND = 'toggleAudio'

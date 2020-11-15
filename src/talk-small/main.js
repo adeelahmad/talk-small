@@ -1,3 +1,5 @@
+import './main.css'
+
 import App from './components/App.svelte'
 
 import {initializeWindow} from './portal'

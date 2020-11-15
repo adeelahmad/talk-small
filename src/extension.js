@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
-import webviewHtml from 'webview:talk-small'
+import path from 'path'
+import fs from 'fs'
 import { EventEmitter } from 'events'
 import { generateRoomWithoutSeparator } from '@jitsi/js-utils/random/roomNameGenerator'
 import {
@@ -19,6 +20,21 @@ import {
 	CONNECTED_CONTEXT,
 	CONNECTION_FAILED_EVENT
 } from './constants'
+
+/**
+ * Generate content for webview from index.html while converting local file uris to webview ones
+ * @param {vscode.ExtensionContext} context
+ * @param {vscode.Webview} webview 
+ * @returns {string}
+ */
+const getWebviewContent = (context, webview) => {
+	const htmlPath = path.join(context.extensionPath, 'out/public/index.html')
+	const cssUri = vscode.Uri.file(path.join(context.extensionPath, 'out/public/main.css'))
+	const jsUri = vscode.Uri.file(path.join(context.extensionPath, 'out/public/main.js'))
+	return fs.readFileSync(htmlPath, 'utf8')
+		.replace('./main.css', webview.asWebviewUri(cssUri))
+		.replace('./main.js', webview.asWebviewUri(jsUri))
+}
 
 class Extension extends EventEmitter {
 	constructor() {
@@ -167,11 +183,13 @@ class Extension extends EventEmitter {
 				view.webview.options = {
 					enableScripts: true, // jitsi needs javascript
 					enableCommandUris: true, // to directly call commands from webview
-					localResourceRoots: [] // we don't need any local extension files in webview
+					localResourceRoots: [
+						vscode.Uri.file(path.join(this.context.extensionPath, 'out/public'))
+					], // we'd like to provide static files from public directory
 				}
 
 				// set webview's html
-				view.webview.html = webviewHtml
+				view.webview.html = getWebviewContent(this.context, view.webview)
 			}
 		}, {
 			webviewOptions: {

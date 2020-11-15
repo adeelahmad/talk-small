@@ -5,7 +5,7 @@ import {
     CONNECTION_FAILED_RESPONSE,
     DISCONNECTED_RESPONSE,
     INITIALIZED_RESPONSE
-} from '../../constants'
+} from '../constants'
 import store from './store'
 
 // extension
