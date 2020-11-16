@@ -237,6 +237,7 @@ class Extension extends EventEmitter {
 			const password = await vscode.window.showInputBox({
 				ignoreFocusOut: true,
 				password: true,
+				placeHolder: 'Cannot be left empty.',
 				prompt: 'Enter the room password.'
 			})
 			// abort if password is empty or inputBox is closed
