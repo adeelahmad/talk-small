@@ -93,7 +93,8 @@
 		"lint": "eslint .",
 		"build": "rollup -c",
 		"watch": "rollup -cw",
-		"vscode:prepublish": "npm run lint && NODE_ENV=production npm run build"
+		"vscode:prepublish": "npm run lint && NODE_ENV=production npm run build",
+		"vscode": "code --no-sandbox --extensionDevelopmentPath $(pwd)"
 	},
 	"devDependencies": {
 		"@fortawesome/fontawesome-free": "^5.15.1",
