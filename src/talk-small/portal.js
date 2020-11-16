@@ -4,12 +4,25 @@ import {
     CONNECTED_RESPONSE,
     CONNECTION_FAILED_RESPONSE,
     DISCONNECTED_RESPONSE,
-    INITIALIZED_RESPONSE
+    INITIALIZED_RESPONSE,
+    NOTIFICATION_RESPONSE,
+    PASSWORD_REQUEST,
+    PASSWORD_SET_RESPONSE,
+    PASSWORD_REQUIRED_RESPONSE
 } from '../constants'
-import store from './store'
 
 // extension
 const vscode = acquireVsCodeApi()
+
+import store from './store'
+
+export function requirePassword() {
+    vscode.postMessage({ type: PASSWORD_REQUIRED_RESPONSE })
+}
+
+export function notify(...args) {
+    vscode.postMessage({ type: NOTIFICATION_RESPONSE, payload: { args } })
+}
 
 export function initializeWindow() {
     // register extension event handlers
@@ -27,6 +40,10 @@ export function initializeWindow() {
                 case DISCONNECT_REQUEST: {
                     await store.disconnect(data.payload)
                     return vscode.postMessage({ type: DISCONNECTED_RESPONSE })
+                }
+                case PASSWORD_REQUEST: {
+                    await store.password(data.payload)
+                    return vscode.postMessage({ type: PASSWORD_SET_RESPONSE })
                 }
             }
         }

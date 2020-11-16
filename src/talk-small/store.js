@@ -5,11 +5,15 @@ import {
     PARTICIPANT_JOINED_EVENT,
     PARTICIPANT_KICKED_OUT_EVENT,
     PARTICIPANT_LEFT_EVENT,
-    DISPLAY_NAME_CHANGE_EVENT
+    DISPLAY_NAME_CHANGE_EVENT,
+    PARTICIPANT_ROLE_CHANGED_EVENT,
+    PASSWORD_REQUIRED_EVENT,
+    PASSWORD_COMMAND
 } from '../constants'
 
 import { writable } from 'svelte/store'
 import { produce } from 'immer'
+import { requirePassword } from './portal'
 
 // create state
 const initialState = {
@@ -17,6 +21,7 @@ const initialState = {
     connected: false,
     muted: true,
     roomName: null,
+    password: null,
     participants: []
 }
 
@@ -38,7 +43,7 @@ const onceWithTimeout = (emitter, event, timeout) => new Promise((res, rej) => {
 // connects to jitsi conference
 export const connect = ({ domain, options }) => new Promise((res, rej) => {
     // handle connection success
-    const connected = ({ roomName, id }) => update(produce(state => {
+    const connected = ({ roomName }) => update(produce(state => {
         state.connected = true
         state.muted = true
         state.roomName = roomName
@@ -63,6 +68,13 @@ export const connect = ({ domain, options }) => new Promise((res, rej) => {
             .map(({ formattedDisplayName }) => ({ formattedDisplayName }))
     }))
 
+    // handle role change (aka set password by moderator)
+    const roleChanged = ({ role }) => {
+        update(produce(state => {
+            if (role === 'moderator' && !state.password) requirePassword()
+        }))
+    }
+
     // try connecting
     update(produce(state => {
         if (!state.connected) {
@@ -75,6 +87,8 @@ export const connect = ({ domain, options }) => new Promise((res, rej) => {
             state.api.on(PARTICIPANT_KICKED_OUT_EVENT, participationChanged)
             state.api.on(PARTICIPANT_LEFT_EVENT, participationChanged)
             state.api.on(DISPLAY_NAME_CHANGE_EVENT, participationChanged)
+            state.api.on(PARTICIPANT_ROLE_CHANGED_EVENT, roleChanged)
+            state.api.on(PASSWORD_REQUIRED_EVENT, requirePassword)
             onceWithTimeout(state.api, VIDEO_CONFERENCE_JOINED_EVENT, CONNECTION_TIMEOUT)
                 .then(connected)
                 .catch(connectionFailed)
@@ -109,10 +123,16 @@ export const mute = () => update(produce(state => {
     }
 }))
 
+export const password = async ({password}) => update(produce(state => {
+    state.password = password
+    state.api.executeCommand(PASSWORD_COMMAND, password)
+}))
+
 export default {
     subscribe,
     connect,
     disconnect,
     unmute,
-    mute
+    mute,
+    password
 }

@@ -9,6 +9,7 @@ import postcssUrl from 'postcss-url'
 import postcssImport from 'postcss-import'
 import copy from 'rollup-plugin-copy'
 import { minify as htmlMinifier } from 'html-minifier-terser'
+import autoPreprocess from 'svelte-preprocess'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -45,7 +46,10 @@ export default [
                     'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development')
                 }
             }),
-            svelte({ emitCss: true }),
+            svelte({
+                emitCss: true,
+                preprocess: autoPreprocess()
+            }),
             postcss({
                 extract: true,
                 minimize: isProduction,

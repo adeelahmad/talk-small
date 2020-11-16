@@ -18,7 +18,10 @@ import {
 	DISCONNECT_COMMAND,
 	SET_CONTEXT_COMMAND,
 	CONNECTED_CONTEXT,
-	CONNECTION_FAILED_EVENT
+	CONNECTION_FAILED_EVENT,
+	NOTIFICATION_EVENT,
+	PASSWORD_REQUIRED_EVENT,
+	PASSWORD_REQUEST
 } from './constants'
 
 /**
@@ -220,6 +223,32 @@ class Extension extends EventEmitter {
 		this.on(DISCONNECTED_EVENT, () => {
 			// update context
 			vscode.commands.executeCommand(SET_CONTEXT_COMMAND, CONNECTED_CONTEXT, false)
+		})
+
+		// notification handler
+		this.on(NOTIFICATION_EVENT, ({ args }) => {
+			// show information message from vscode
+			vscode.window.showInformationMessage(...args)
+		})
+
+		// handle password request
+		this.on(PASSWORD_REQUIRED_EVENT, async () => {
+			// request password
+			const password = await vscode.window.showInputBox({
+				ignoreFocusOut: true,
+				password: true,
+				prompt: 'Enter the room password.'
+			})
+			// abort if password is empty or inputBox is closed
+			if (!password) {
+				vscode.window.showErrorMessage('Password is required. Disconected.')
+				await this.disconnect()
+			}
+			// send password request to webview
+			this.view.webview.postMessage({
+				type: PASSWORD_REQUEST,
+				payload: { password }
+			})
 		})
 
 		// cleanup
