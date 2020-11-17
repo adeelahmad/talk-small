@@ -86,13 +86,13 @@
 <div class="controls">
     <button
         class="mic"
-        class:connected={$state.connected}
+        class:connected={$state.connected && $state.password}
         class:muted={$state.muted}
         on:mousedown={unmute}
         on:mouseup={mute}
         on:mouseleave={mute}
-        disabled={!$state.connected}>
-        {#if $state.connected && !$state.muted}
+        disabled={!$state.connected || !$state.password}>
+        {#if $state.connected && $state.password && !$state.muted}
             {@html connectedMicrophone}
         {:else}
             {@html disconnectedMicrophone}
