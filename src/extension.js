@@ -37,6 +37,7 @@ const getWebviewContent = (context, webview) => {
 	return fs.readFileSync(htmlPath, 'utf8')
 		.replace('./main.css', webview.asWebviewUri(cssUri))
 		.replace('./main.js', webview.asWebviewUri(jsUri))
+		.replace(/CSP_SOURCE/g, webview.cspSource)
 }
 
 class Extension extends EventEmitter {

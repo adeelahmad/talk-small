@@ -3,8 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- TODO: Implement CSP for better security -->
-    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> -->
+    <!-- allowing 'unsafe-inline' in 'style-src' due to font-awesome -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'none';
+        script-src CSP_SOURCE https://meet.jit.si;
+        style-src CSP_SOURCE 'unsafe-inline';
+        frame-src https://meet.jit.si;
+    ">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talk Small</title>
     <link rel="stylesheet" href="./main.css">
