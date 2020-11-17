@@ -88,6 +88,14 @@ The extension uses Jitsi as backend to provide communication. Read
 
 ## Screenshots:
 
+1. Configure your Display Name
+
+    ![Display Name](screenshots/displayName.png)
+    
+    - Open Settings
+    - Search "Talk Small"
+    - Change Display Name
+
 1. Connect
     * Using `talk-small:connect` command
 
@@ -100,26 +108,26 @@ The extension uses Jitsi as backend to provide communication. Read
     * Disconnection can be done the same way, i.e. via `talk-small.disconnect`
     command or via `Disconnect` button in `talk-small` view
 
-2. Enter optional room name
+1. Enter optional room name
 
     ![Room Name Input](screenshots/roomName.png)
     
     - The input will be prefilled with last used room name for quick access
     - If this input is left empty, the extension will generate a random room name for you
 
-3. Enter required password
+1. Enter required password
 
     ![Password Input](screenshots/password.png)
 
-4. Connected
+1. Connected
 
     ![Connected](screenshots/mute.png)
 
-5. Push to Talk
+1. Push to Talk
 
     ![Speaking](screenshots/unmute.png)
 
-6. Example conference
+1. Example conference
 
     ![Example Conference](screenshots/example.png)
 
