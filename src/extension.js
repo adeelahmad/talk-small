@@ -91,7 +91,6 @@ class Extension extends EventEmitter {
 		const displayName = this.configuration.get(DISPLAY_NAME)
 		const lastUsedRoomName = this.context.workspaceState.get(LAST_USED_ROOM_NAME)
 		let roomName = await vscode.window.showInputBox({
-			ignoreFocusOut: true,
 			prompt: 'Enter a room name.',
 			placeHolder: 'Leave empty for a random room.',
 			value: lastUsedRoomName
@@ -236,7 +235,6 @@ class Extension extends EventEmitter {
 		this.on(PASSWORD_REQUIRED_EVENT, async () => {
 			// request password
 			const password = await vscode.window.showInputBox({
-				ignoreFocusOut: true,
 				password: true,
 				placeHolder: 'Cannot be left empty.',
 				prompt: 'Enter the room password.'

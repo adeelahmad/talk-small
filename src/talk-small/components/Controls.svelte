@@ -33,25 +33,19 @@
         flex-direction: column;
         align-items: center;
     }
-    .mic {
-        border: 2px solid var(--vscode-activityBar-inactiveForeground);
+    .mic.connected {
+        border: 2px solid transparent;
         border-radius: 50%;
-        background-color: transparent;
-        color: var(--vscode-activityBar-inactiveForeground);
+        background-color: var(--vscode-button-hoverBackground);
+        color: var(--vscode-sideBar-background);
         padding: 8px;
         outline: none;
+        cursor: pointer;
 
-        &.connected {
-            border-color: transparent;
-            background-color: var(--vscode-button-hoverBackground);
-            color: var(--vscode-sideBar-background);
-            cursor: pointer;
-
-            &.muted {
-                border-color: var(--vscode-button-hoverBackground);
-                background-color: transparent;
-                color: var(--vscode-button-hoverBackground);
-            }
+        &.muted {
+            border-color: var(--vscode-button-hoverBackground);
+            background-color: transparent;
+            color: var(--vscode-button-hoverBackground);
         }
     }
     .control {
@@ -59,11 +53,10 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        background-color: var(--vscode-input-background);
-        color: var(--vscode-input-foreground);
-        border: 1px solid var(--vscode-input-border);
         padding: 4px;
+        border: 1px solid var(--vscode-foreground);
         > input {
+            color: var(--vscode-foreground);
             background: transparent;
             border: none;
             overflow: hidden;
@@ -72,10 +65,7 @@
         }
         > .copy-icon {
             cursor: pointer;
-            color: var(--vscode-input-foreground);
-            &:hover {
-                color: var(--vscode-activityBar-foreground);
-            }
+            color: var(--vscode-foreground);
         }
         &.room-name {
             margin: 12px 0;
@@ -84,21 +74,24 @@
 </style>
 
 <div class="controls">
-    <button
-        class="mic"
-        class:connected={$state.connected && $state.password}
-        class:muted={$state.muted}
-        on:mousedown={unmute}
-        on:mouseup={mute}
-        on:mouseleave={mute}
-        disabled={!$state.connected || !$state.password}>
-        {#if $state.connected && $state.password && !$state.muted}
-            {@html connectedMicrophone}
-        {:else}
-            {@html disconnectedMicrophone}
-        {/if}
-    </button>
     {#if $state.connected && $state.password}
+        <h2>Connected</h2>
+        <br />
+        <button
+            class="mic"
+            class:connected={$state.connected && $state.password}
+            class:muted={$state.muted}
+            on:mousedown={unmute}
+            on:mouseup={mute}
+            on:mouseleave={mute}
+            disabled={!$state.connected || !$state.password}>
+            {#if $state.connected && $state.password && !$state.muted}
+                {@html connectedMicrophone}
+            {:else}
+                {@html disconnectedMicrophone}
+            {/if}
+        </button>
+        <br />
         <div class="control room-name">
             <input value={$state.roomName} disabled />
             <span
@@ -111,5 +104,28 @@
                 class="copy-icon"
                 on:click={copyPassword}>{@html copyIcon}</span>
         </div>
+    {:else}
+        <h2>Ready to connect</h2>
+        <h3>How to connect:</h3>
+        <ol>
+            <li>Click Connect</li>
+            <li>
+                Enter a room name of your choice. When prompted, you can keep
+                the input empty to have a randomly generated room name.
+            </li>
+            <li>
+                Enter the room's password. You should choose a strong memorable
+                password.
+            </li>
+        </ol>
+        <h3>Push to Talk:</h3>
+        <ul>
+            <li>You can <b>Hold the microphone button</b> and speak</li>
+            <li>
+                Or if the extension view is active, you can
+                <b>hold spacebar</b>
+                while you speak
+            </li>
+        </ul>
     {/if}
 </div>

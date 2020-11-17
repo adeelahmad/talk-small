@@ -12,7 +12,7 @@
         > .participant {
             padding: 4px;
             color: var(--vscode-list-hoverForeground);
-            border: 2px solid var(--vscode-list-hoverBackground);
+            border: 2px solid var(--vscode-list-hoverBackground, transparent);
             &.participant.highlighted {
                 border-color: transparent;
                 background-color: var(--vscode-list-hoverBackground);

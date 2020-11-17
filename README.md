@@ -115,13 +115,13 @@ The extension uses Jitsi as backend to provide communication. Read
 
     ![Connected](screenshots/mute.png)
 
-5. Speaking
+5. Push to Talk
 
     ![Speaking](screenshots/unmute.png)
 
 6. Example conference
 
-    ![Example Conference](screenshots/connected.png)
+    ![Example Conference](screenshots/example.png)
 
 ## Links:
 

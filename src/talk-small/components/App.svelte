@@ -22,6 +22,7 @@
     {#if $state.connected && $state.password}
         <Participants />
     {/if}
+    <br />
     <div class="attribution">
         Powered by
         <a href="https://meet.jit.si">Jitsi</a>
