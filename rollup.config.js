@@ -10,8 +10,10 @@ import postcssImport from 'postcss-import'
 import copy from 'rollup-plugin-copy'
 import { minify as htmlMinifier } from 'html-minifier-terser'
 import autoPreprocess from 'svelte-preprocess'
+import { sync as svg2png } from 'svg2png'
 
 const isProduction = process.env.NODE_ENV === 'production'
+const icon = 'node_modules/@fortawesome/fontawesome-free/svgs/solid/broadcast-tower.svg'
 
 export default [
     {
@@ -25,11 +27,15 @@ export default [
             commonjs(),
             isProduction && terser(),
             copy({
-                targets: [{
-                    src: 'node_modules/@fortawesome/fontawesome-free/svgs/solid/broadcast-tower.svg',
-                    dest: 'out',
-                    rename: 'icon.svg'
-                }]
+                targets: [
+                    {src: icon, dest: 'out', rename: 'icon.svg'},
+                    {
+                        src: icon,
+                        dest: 'out',
+                        rename: 'icon.png',
+                        transform: svg => svg2png(svg, {width: 256, height: 256})
+                    }
+                ]
             })
         ],
         external: ['vscode', ...builtins]

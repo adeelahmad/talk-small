@@ -1,8 +1,7 @@
+.idea
 .vscode
 .eslintignore
 .gitignore
 .eslintrc.json
-jsconfig.json
 rollup.config.js
-rollup-plugin-webviewer.js
 src
