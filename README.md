@@ -50,6 +50,42 @@ and you chime in only when needed, you can do it right from your editor.
 during releases for easy communication, which is basically just everyone sitting
 muted on a call.
 
+## Installation:
+
+1. Visit the
+[Extension Page](https://marketplace.visualstudio.com/items?itemName=dhruvin-dev.talk-small)
+on Visual Studio Marketplace, and install.
+
+1. Only for macOS users with Mojave or later
+    - macOS Mojave introduced `Microphone Permission` for `Apps`. For obvious reasons,
+    VSCode does not enlist that it needs microphone. Hence extensions hosted inside
+    it can not access the microphone either. There's no API in VSCode Extension SDK
+    to ask for microphone permission as well.
+    [For the curious](https://github.com/microsoft/vscode/issues/95062).
+    
+    - As a workaround, please open vscode
+    [from your terminal](https://code.visualstudio.com/docs/setup/mac#_launching-from-the-command-line).
+    You'll be asked to allow `Terminal` to access `Microphone`. You have to accept 
+    **ONLY** that.
+    
+    - **BEWARE: THIS WILL ALLOW MICROPHONE ACCESS TO ANY COMMAND YOU RUN FROM THAT
+    TERMINAL. I DO NOT RECOMMEND IT IF YOU DO NOT NOW THE CONSEQUENCES.**
+    
+## Privacy Statement:
+
+### Extension:
+
+This extension stores
+1. The name of last connected room (for quick reconnection)
+1. Your display name (for convenience)
+
+Everything that is stored by the extension is on your local machine.
+
+### Jitsi
+
+The extension uses Jitsi as backend to provide communication. Read
+[Jitsi's Privacy Policy](https://jitsi.org/meet-jit-si-privacy/).
+
 ## Screenshots:
 
 1. Connect
