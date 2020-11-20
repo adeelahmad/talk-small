@@ -1,7 +1,7 @@
 {
 	"name": "talk-small",
 	"publisher": "dhruvin-dev",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"engines": {
 		"vscode": "^1.51.0"
 	},
